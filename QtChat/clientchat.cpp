@@ -26,7 +26,7 @@ ClientChat::ClientChat(QString nickname)
     connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readDatagrammFromServer()));
     connect(tcpSocket, SIGNAL(hostFound()), this, SLOT(processSignaHostFounded()));
     connect(tcpSocket, SIGNAL(connected()), this, SLOT(processSignaClientConnected()));
-    //connect(tcpSocket, SIGNAL(errorOccurred), this, SLOT(processSignaErrorOccured()));
+    connect(tcpSocket, SIGNAL(errorOccurred), this, SLOT(processSignaErrorOccured()));
 }
 
 void ClientChat::setServerAddressAndPort(QString Address, quint16 port)
@@ -321,7 +321,7 @@ void ClientChat::postConnectDatagramm()
     //EVMp_CONNECT_<длина имени>_<имя> - подключение клиента.
 
     //----------------------------------------------------------------
-    qDebug() << "nikname="+nikname;
+    //qDebug() << "nikname="+nikname;
     QString datagrammConnect="EVMp_CONNECT_"+ QByteArray::number (nikname.toUtf8().size())+"_"+ nikname.toUtf8();
     QByteArray l;
     QDataStream stream (&l, QIODevice::WriteOnly);
@@ -339,7 +339,8 @@ void ClientChat::postConnectDatagramm()
    }
    else{
 
-        qDebug() << "state of tcpSocket is not connected";
+        qDebug() << "state of tcpSocket have not connected state. I cant post connect datagram";
+
    }
 
 }
@@ -349,6 +350,7 @@ void ClientChat::disconnect()
 
     if(this->tcpSocket->state()==QAbstractSocket::ConnectedState){
         tcpSocket->disconnectFromHost();
+        emit userDisconnect(this->nikname);
     }
 }
 /**Метод отправляет сообщение в общий чат**/
@@ -388,7 +390,9 @@ void ClientChat::sendPrivateMessage(QString msg, QString recipient)
 
     QString datagrammSendPrivateMsg="EVMp_PRIVATEMSG_"
             + QByteArray::number (recipient.toUtf8().size())
+            +"_"
             + recipient.toUtf8()
+            +"_"
             + msg.toUtf8();
     QByteArray l;
     QDataStream stream (&l, QIODevice::WriteOnly);
@@ -411,17 +415,18 @@ void ClientChat::sendPrivateMessage(QString msg, QString recipient)
 
 void ClientChat::sendVoice()
 {
+    /*
            QAudioFormat format;
            format.setSampleRate(128000);
            format.setChannelCount(1);
-           format.setSampleSize(16);
+           format.setSampleSize(16);//Устанавливает размер выборки в указанный sampleSize в битах
            format.setCodec("audio/pcm");
            format.setByteOrder(QAudioFormat::LittleEndian);
            format.setSampleType(QAudioFormat::UnSignedInt);
            QAudioInput* input = new QAudioInput(format);
            QUdpSocket* socket = new QUdpSocket();
            socket->connectToHost("127.0.0.1", 1002);
-           input->start(socket);
+           input->start(socket);*/
 }
 
 
