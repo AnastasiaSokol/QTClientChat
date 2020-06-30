@@ -7,6 +7,12 @@
 #include <QListWidgetItem>
 #include <QList>
 #include <QMessageBox>
+#include "emiplib/mipaudiosession.h"
+#include "emiplib/mippainputoutput.h"
+#include "emiplib/mipconfig.h"
+#include "jrtplib3/rtpipv4address.h"
+#include <iostream>
+#include <jrtplib3/rtpipv4address.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,6 +31,9 @@ private:
     ClientChat *newclient; //текущий клиент запустивший приложение
     //QHash<QString, QString> usersList; //список учатников чата
     QStringList usersList;//список учаcтников чата
+    QMap<QString, QHostAddress> userCalList;//список пользователей разрешивших звонок сначала username потом ipAddress
+    MIPAudioSessionParams audioSessParams;
+    MIPAudioSession audioSess;
 
 public slots:
     void connectToHost();
@@ -37,9 +46,19 @@ public slots:
     void paintPrivateMsgFromRecipient(QString msg,QString recipient);//отрисовка сообщения пришедшего от клиента в приватный чат
     void paintMsgFromRecipientToSharedChat(QString msg,QString recipient);//отрисовка сообщения пришедшего от клиента
     void sendMsg();//отправка сообщения
+    void callToHost();//отправка сообщения
+    void callToUser();//отправка сообщения пользователю что мы хотим связаться с ним
+    void outputSounds();//вывод звука из сокета
+    void callPtP(QHostAddress userAddress, quint16 audioPort);
+    void stopCall();
+
+    void showMsgCallAccept(QString username, QString idAddress);//вывод сообщения что запрос на звонок разрешен
+    void showMsgCallReject(QString username);//вывод сообщения что звонок отклонен пользователем
+    void showMsgRequestForCalling(QString username);//запрос от пользователя на входящий звонок
 public:
     QString *serverAddress;//адресс сервера
-    quint16 *serverPort;//порт сервера
+    quint16 *serverPort;//порт сервера для tcp
+    quint16 *serverPortUDP;//порт сервера для tcp
     //int onlineCounter;//количество участников
 
 };

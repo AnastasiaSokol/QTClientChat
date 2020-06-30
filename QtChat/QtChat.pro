@@ -1,8 +1,10 @@
-QT       += core gui network
+QT       += core gui network multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+
+
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -24,10 +26,42 @@ HEADERS += \
     clientchat.h \
     clientwindow.h
 
+
 FORMS += \
     clientwindow.ui
+
+
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32: LIBS += -lWS2_32
+
+win32: LIBS += -LC:/local2/emiplib/lib/ -lemiplib
+
+INCLUDEPATH += C:/local2/emiplib/include
+DEPENDPATH += C:/local2/emiplib/include
+
+
+win32:!win32-g++: PRE_TARGETDEPS += C:/local2/emiplib/lib/emiplib.lib
+else:win32-g++: PRE_TARGETDEPS += C:/local2/emiplib/lib/libemiplib.a
+
+
+
+win32: LIBS += -LC:/local2/jrtplib/lib/ -llibjrtp.dll
+
+INCLUDEPATH += C:/local2/jrtplib/include
+DEPENDPATH += C:/local2/jrtplib/include
+
+
+
+win32: LIBS += -LC:/local2/jthread/lib/ -llibjthread.dll
+
+INCLUDEPATH += C:/local2/jthread/include
+DEPENDPATH += C:/local2/jthread/include
+
+
+win32: LIBS += -lWinMM

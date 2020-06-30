@@ -1,0 +1,6 @@
+Name: Jrtplib 
+Description: A full featured RTP library
+Requires:
+Version: 3.11.2
+Libs:  -LC:/Program\ Files\ (x86)/jrtplib/lib -ljrtp -LC:/local2/jthread/lib -ljthread ws2_32
+Cflags:  -IC:/local2/jthread/include -IC:/Program\ Files\ (x86)/jrtplib/include

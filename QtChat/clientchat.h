@@ -5,10 +5,10 @@
 #include <QWidget>
 #include <QUdpSocket>
 #include <QTcpSocket>
-#include <QtMultimedia/qaudioformat.h>
-#include <QtMultimedia/QAudioOutput>
-#include <QtMultimedia/QAudioInput>
-
+#include <QAudioOutput>
+#include <QAudioInput>
+#include <QAudioDeviceInfo>
+#include <QAudioFormat>
 
 class ClientChat : public QObject
 {
@@ -25,7 +25,9 @@ public slots:
 
 
     void        setServerAddressAndPort(QString Address, quint16 port);// Установка сведений о сервере
-    void        connectToHost();//Создает соединение с сервером
+     void       setServerUDPPort( quint16 port);
+    void        connectToHostByTCP();//Создает соединение с сервером по TCP
+    void        connectToHostByUDP();//создает соединение с сервером по UDP
     //выделяет из строки <длина имени>_<имя> имя
     QString     extractClientName(QString d);
     //разбирает строку вида <длина имени>_<отправитель>_<сообщение>
@@ -35,14 +37,25 @@ public slots:
     void       processSignaHostFounded();//обрабатывает событие что сервер найден
     void       processSignaClientConnected();//обрабатывает событие клиенту удалось установть соединение
     void       processSignaErrorOccured();//обрабатывает ошибку установки соединения с сервером
-
+    void       callToServer();//осуществить звонок на сервер
+    void       stopSendVoiceToServer();//прекращение передачи голоса на сервер
+    QString    getSupportedInputDevice();//получить информацию о  устройстве ввода
+    QString    getSupportedOutputDevice();//получить информацию о  устройстве выввода
     //---------------------------------------------------
     //запросы к серверу
     void        postConnectDatagramm(); // отправляет запрос приветствие серверу, что он соединился
     void        disconnect();
     void        sendMessage(QString msg);//отправка сообщения от клиента в общий чат
     void        sendPrivateMessage(QString msg,  QString addressRecipient);//отправка сообщения от клиента в приватный чат
+
+    //запросы к серверу для осуществления звонков
+    void        sendRequestForCalling(QString recipient);//отправка сообщения от клиента что он хочет позвонить кому-то
+    void        acceptCall(QString recipient);//подтверждение согласия на соединение
+    void        rejectCall(QString recipient);//отклонение  соединения
+    QStringList extractClientAddressAndName(QString d);
+
     void        sendVoice();// reads voice from the microphone and sends it via UDP socket
+    void        outputSoundsFromServer();// reads voice from the server and output
 
     //---------------------------------------------------
 
@@ -56,16 +69,29 @@ signals:
     void        hostFounded();//клиент нашел хост
     void        cliectIsConnected();
     void        errorOccured();
+    //сигналы относязие к реализации звонков
+    void        callAccept(QString username, QString idAddress);
+    void        callReject(QString userName);
+    void        eVMpCall(QString userName);
 
   public:
 
    QTcpSocket   *tcpSocket; //tcp сокет для текстового чата
+   QUdpSocket   *udpSocket; //udp сокет для голосового чата
    quint16      blockSize = 0;
 
    QString      nikname;
    QByteArray   datagram;//датаграмма клиента
    QString      serverAddress;//адрес сервера
-   quint16      serverPort;//порт сервера
+   quint16      serverPortTCP;//порт сервера для tcp
+   quint16      serverPortUDP;//порт сервера для udp
+
+   QAudioInput*  input;
+   QAudioOutput* output;
+   QString inputDeviceInfoStr;
+   QString outputDeviceInfoStr;
+
+
 };
 
 #endif // CLIENTCHAT_H
